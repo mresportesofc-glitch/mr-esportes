@@ -10,8 +10,8 @@
 <meta name="theme-color" content="#0f0f14"/>
 <!-- PWA Support -->
 <link rel="manifest" href="./manifest.json">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 110'><path d='M50 4 L92 22 L92 66 Q92 90 50 106 Q8 90 8 66 L8 22 Z' fill='%230a0a0a' stroke='%23C8A020' stroke-width='4'/><text x='50' y='66' text-anchor='middle' font-family='Arial Black' font-weight='900' font-size='42' fill='%23fff'>MR</text></svg>">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><defs><linearGradient id='g1' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' style='stop-color:%23C8A020'/><stop offset='45%' style='stop-color:%23F0D060'/><stop offset='100%' style='stop-color:%238B6010'/></linearGradient></defs><path d='M96 8 L176 42 L176 126 Q176 170 96 186 Q16 170 16 126 L16 42 Z' fill='%230f0f14' stroke='url(%23g1)' stroke-width='7'/><text x='96' y='128' text-anchor='middle' font-size='80' font-weight='900' fill='%23fff'>MR</text></svg>">
+<link rel="icon" href="https://raw.githubusercontent.com/mresportesofc-glitch/mr-esportes/main/53cd50bd-cc7c-41d2-b060-8c14568b6f11.jpg">
+<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/mresportesofc-glitch/mr-esportes/main/53cd50bd-cc7c-41d2-b060-8c14568b6f11.jpg">
 <title>MR Esportes</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -121,6 +121,8 @@ button{cursor:pointer;border:none;}
 .empty{text-align:center;padding:40px 0;color:#555;}
 .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);color:#fff;padding:10px 24px;border-radius:24px;font-weight:700;font-size:14px;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.5);white-space:nowrap;}
 
+.header-logo{width:40px;height:40px;border-radius:8px;object-fit:cover;}
+
 @supports (display: standalone) {
   body { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
 }
@@ -129,18 +131,7 @@ button{cursor:pointer;border:none;}
 <body>
 
 <div id="splash">
-  <svg width="90" height="90" viewBox="0 0 192 192" fill="none">
-    <defs>
-      <linearGradient id="gs" x1="20" y1="10" x2="172" y2="182" gradientUnits="userSpaceOnUse">
-        <stop offset="0%" stop-color="#C8A020"/><stop offset="45%" stop-color="#F0D060"/><stop offset="100%" stop-color="#8B6010"/>
-      </linearGradient>
-      <linearGradient id="gt" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
-        <stop offset="0%" stop-color="#E8E8E8"/><stop offset="50%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#A8A8A8"/>
-      </linearGradient>
-    </defs>
-    <path d="M96 8 L176 42 L176 126 Q176 170 96 186 Q16 170 16 126 L16 42 Z" fill="#111" stroke="url(#gs)" stroke-width="7"/>
-    <text x="96" y="128" text-anchor="middle" font-family="Arial Black,sans-serif" font-weight="900" font-size="80" fill="url(#gt)">MR</text>
-  </svg>
+  <img src="https://raw.githubusercontent.com/mresportesofc-glitch/mr-esportes/main/53cd50bd-cc7c-41d2-b060-8c14568b6f11.jpg" style="width:90px;height:90px;border-radius:12px;object-fit:cover;"/>
   <p style="color:#C8A020;font-size:22px;font-weight:800;letter-spacing:2px;margin-top:18px;">MR ESPORTES</p>
   <p style="color:#555;font-size:12px;letter-spacing:3px;margin-top:6px;">CONTROLE DE VENDAS</p>
 </div>
@@ -149,18 +140,7 @@ button{cursor:pointer;border:none;}
   <!-- HEADER -->
   <div class="header">
     <div class="header-l">
-      <svg width="40" height="40" viewBox="0 0 100 110" fill="none">
-        <defs>
-          <linearGradient id="hgs" x1="10" y1="5" x2="90" y2="105" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#C8A020"/><stop offset="45%" stop-color="#F0D060"/><stop offset="100%" stop-color="#8B6010"/>
-          </linearGradient>
-          <linearGradient id="hgt" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
-            <stop offset="0%" stop-color="#E8E8E8"/><stop offset="50%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#A8A8A8"/>
-          </linearGradient>
-        </defs>
-        <path d="M50 4 L92 22 L92 66 Q92 90 50 106 Q8 90 8 66 L8 22 Z" fill="#0a0a0a" stroke="url(#hgs)" stroke-width="4"/>
-        <text x="50" y="66" text-anchor="middle" font-family="Arial Black,sans-serif" font-weight="900" font-size="42" fill="url(#hgt)">MR</text>
-      </svg>
+      <img src="https://raw.githubusercontent.com/mresportesofc-glitch/mr-esportes/main/53cd50bd-cc7c-41d2-b060-8c14568b6f11.jpg" class="header-logo"/>
       <div>
         <span class="app-name">MR Esportes</span>
         <p class="app-sub">CONTROLE DE VENDAS</p>
