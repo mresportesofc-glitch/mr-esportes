@@ -297,6 +297,7 @@ input:focus,select:focus,textarea:focus{outline:none;}
       <div class="nav-item" data-page="pedidos"><span class="icon">📋</span> Pedidos</div>
       <div class="nav-item" data-page="clientes"><span class="icon">👥</span> Clientes</div>
       <div class="nav-item" data-page="catalogo"><span class="icon">👕</span> Catálogo</div>
+      <div class="nav-item" data-page="financeiro"><span class="icon">📊</span> Financeiro</div>
       <div class="nav-item" data-page="investimentos"><span class="icon">💰</span> Investimentos</div>
       <div class="nav-item" id="nav-receber" data-page="receber"><span class="icon">📥</span> A Receber</div>
       <div class="nav-item" data-page="config"><span class="icon">⚙️</span> Configurações</div>
@@ -329,16 +330,20 @@ input:focus,select:focus,textarea:focus{outline:none;}
 
       <!-- DASHBOARD -->
       <div class="page active" id="page-dashboard">
+        <!-- Indicador do mês -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <p style="font-size:13px;color:var(--text3);font-weight:600" id="d-mes-label">📅 Carregando...</p>
+        </div>
         <div class="dash-grid">
-          <div class="dash-card green"><div class="dc-lbl">Faturamento</div><div class="dc-val" id="d-fat">R$ 0,00</div><div class="dc-sub" style="color:var(--text3)">soma dos pedidos</div></div>
+          <div class="dash-card green"><div class="dc-lbl">Faturamento</div><div class="dc-val" id="d-fat">R$ 0,00</div><div class="dc-sub" style="color:var(--text3)" id="d-fat-sub">mês atual</div></div>
           <div class="dash-card blue"><div class="dc-lbl">Lucro</div><div class="dc-val" id="d-lucro">R$ 0,00</div><div class="dc-sub" id="d-pct" style="color:var(--blue)">0.0% do fat.</div></div>
-          <div class="dash-card orange"><div class="dc-lbl">Investido</div><div class="dc-val" id="d-inv">R$ 0,00</div><div class="dc-sub" style="color:var(--text3)">total na loja</div></div>
+          <div class="dash-card orange"><div class="dc-lbl">Investido</div><div class="dc-val" id="d-inv">R$ 0,00</div><div class="dc-sub" style="color:var(--text3)">mês atual</div></div>
           <div class="dash-card gold" id="d-caixa-card"><div class="dc-lbl">Caixa Geral</div><div class="dc-val" id="d-caixa">R$ 0,00</div><div class="dc-sub" style="color:var(--text3)">lucro − invest.</div></div>
         </div>
         <div class="dash-grid" style="grid-template-columns:repeat(4,1fr)">
-          <div class="dash-card purple"><div class="dc-lbl">Qtd. Pedidos</div><div class="dc-val" id="d-qtd">0</div></div>
-          <div class="dash-card" style="border-top-color:#f39c12"><div class="dc-lbl">Pendentes</div><div class="dc-val" style="color:#f39c12" id="d-pend">0</div></div>
-          <div class="dash-card green"><div class="dc-lbl">Qtd. Camisas Vendidas</div><div class="dc-val" id="d-qtd-camisas">0</div><div class="dc-sub" style="color:var(--text3)">total de itens</div></div>
+          <div class="dash-card purple"><div class="dc-lbl">Qtd. Pedidos</div><div class="dc-val" id="d-qtd">0</div><div class="dc-sub" style="color:var(--text3)">mês atual</div></div>
+          <div class="dash-card" style="border-top-color:#f39c12"><div class="dc-lbl">Pendentes</div><div class="dc-val" style="color:#f39c12" id="d-pend">0</div><div class="dc-sub" style="color:var(--text3)">aguardando compra</div></div>
+          <div class="dash-card green"><div class="dc-lbl">Camisas Vendidas</div><div class="dc-val" id="d-qtd-camisas">0</div><div class="dc-sub" style="color:var(--text3)">mês atual</div></div>
           <div class="dash-card clickable blue" onclick="goPage('receber')"><div class="dc-lbl">📥 A Receber</div><div class="dc-val" id="d-rec-total">R$ 0,00</div><div class="dc-sub" id="d-rec-info" style="color:var(--text3)">0 pendente(s)</div></div>
         </div>
         <!-- Aniversariantes do mês -->
@@ -346,9 +351,8 @@ input:focus,select:focus,textarea:focus{outline:none;}
           <div class="alert-title" style="color:var(--blue)">🎂 Aniversariantes do mês</div>
           <div id="d-aniv-lista"></div>
         </div>
-
         <div id="d-alerts"></div>
-        <div class="sec-hd"><h2>Últimos Pedidos</h2></div>
+        <div class="sec-hd" style="margin-top:8px"><h2>Últimos 10 Pedidos</h2><button class="chip" onclick="goPage('pedidos')" style="font-size:12px">Ver todos →</button></div>
         <div id="d-ops"></div>
         <div id="d-ops-empty" class="empty" style="display:none"><div class="empty-icon">📦</div><p>Nenhum pedido ainda.</p></div>
       </div>
@@ -565,6 +569,74 @@ input:focus,select:focus,textarea:focus{outline:none;}
         </div>
         <div style="font-size:12px;color:var(--text3);margin-bottom:12px" id="cli-count"></div>
         <div id="cli-lista"></div>
+      </div>
+
+      <!-- FINANCEIRO -->
+      <div class="page" id="page-financeiro">
+        <!-- Filtro de período -->
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:20px;flex-wrap:wrap">
+          <div style="flex:1;min-width:200px">
+            <label class="lbl">Período</label>
+            <select class="inp" id="fin-periodo" onchange="renderFinanceiro()">
+              <option value="mes">Mês atual</option>
+              <option value="01">Janeiro</option>
+              <option value="02">Fevereiro</option>
+              <option value="03">Março</option>
+              <option value="04">Abril</option>
+              <option value="05">Maio</option>
+              <option value="06">Junho</option>
+              <option value="07">Julho</option>
+              <option value="08">Agosto</option>
+              <option value="09">Setembro</option>
+              <option value="10">Outubro</option>
+              <option value="11">Novembro</option>
+              <option value="12">Dezembro</option>
+              <option value="todos">Desde o início</option>
+            </select>
+          </div>
+          <div style="flex:1;min-width:150px">
+            <label class="lbl">Ano</label>
+            <select class="inp" id="fin-ano" onchange="renderFinanceiro()">
+            </select>
+          </div>
+        </div>
+
+        <!-- Cards principais -->
+        <div class="dash-grid" style="margin-bottom:16px">
+          <div class="dash-card green"><div class="dc-lbl">Faturamento</div><div class="dc-val" id="fin-fat">R$ 0,00</div></div>
+          <div class="dash-card blue"><div class="dc-lbl">Lucro Bruto</div><div class="dc-val" id="fin-lucro-bruto">R$ 0,00</div><div class="dc-sub" id="fin-pct-bruto" style="color:var(--blue)">0.0%</div></div>
+          <div class="dash-card orange"><div class="dc-lbl">Investido</div><div class="dc-val" id="fin-inv">R$ 0,00</div></div>
+          <div class="dash-card gold" id="fin-caixa-card"><div class="dc-lbl">Lucro Líquido</div><div class="dc-val" id="fin-lucro-liq">R$ 0,00</div><div class="dc-sub" id="fin-pct-liq" style="color:var(--gold)">0.0%</div></div>
+        </div>
+        <div class="dash-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:24px">
+          <div class="dash-card purple"><div class="dc-lbl">Pedidos</div><div class="dc-val" id="fin-qtd-ped">0</div></div>
+          <div class="dash-card green"><div class="dc-lbl">Camisas Vendidas</div><div class="dc-val" id="fin-qtd-cam">0</div></div>
+          <div class="dash-card blue"><div class="dc-lbl">Ticket Médio</div><div class="dc-val" id="fin-ticket">R$ 0,00</div><div class="dc-sub" style="color:var(--text3)">por pedido</div></div>
+        </div>
+
+        <!-- Evolução mensal -->
+        <div class="form-section" style="margin-bottom:16px">
+          <h3>📈 Evolução por Mês</h3>
+          <div id="fin-evolucao" style="overflow-x:auto"></div>
+        </div>
+
+        <!-- Top clientes -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+          <div class="form-section">
+            <h3>🏆 Top Clientes</h3>
+            <div id="fin-top-clientes"></div>
+          </div>
+          <div class="form-section">
+            <h3>👕 Top Camisas</h3>
+            <div id="fin-top-camisas"></div>
+          </div>
+        </div>
+
+        <!-- Comparativo -->
+        <div class="form-section">
+          <h3>📊 Comparativo Mensal</h3>
+          <div id="fin-comparativo" style="overflow-x:auto"></div>
+        </div>
       </div>
 
       <!-- CONFIG -->
@@ -811,7 +883,7 @@ async function carregarDados(){
 }
 
 // NAV
-var pageTitles={dashboard:'Início',pedidos:'Pedidos','novo-pedido':'Novo Pedido',catalogo:'Catálogo',clientes:'Clientes',investimentos:'Investimentos',receber:'A Receber',config:'Configurações'};
+var pageTitles={dashboard:'Início',pedidos:'Pedidos','novo-pedido':'Novo Pedido',catalogo:'Catálogo',clientes:'Clientes',financeiro:'Financeiro',investimentos:'Investimentos',receber:'A Receber',config:'Configurações'};
 function goPage(pg){
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   var el=document.getElementById('page-'+pg);if(el)el.classList.add('active');
@@ -829,6 +901,7 @@ function goPage(pg){
   if(pg==='pedidos')renderPedidos();
   if(pg==='catalogo')renderCatalogo();
   if(pg==='clientes'){renderClientes();renderAniversariantes();}
+  if(pg==='financeiro')iniciarFinanceiro();
   if(pg==='investimentos')renderInvest();
   if(pg==='receber')renderReceber();
   if(pg==='config')renderConfig();
@@ -836,25 +909,56 @@ function goPage(pg){
 }
 function fecharClientesModal(){goPage('dashboard');}
 
+function iniciarFinanceiro(){
+  // Popula anos disponíveis
+  var anos=new Set();
+  DB.pedidos.forEach(function(p){if(p.data_pedido)anos.add(parseInt(p.data_pedido.split('-')[0]));});
+  DB.invest.forEach(function(i){if(i.data)anos.add(parseInt(i.data.split('-')[0]));});
+  if(anos.size===0)anos.add(new Date().getFullYear());
+  var anosArr=Array.from(anos).sort(function(a,b){return b-a;});
+  var sel=document.getElementById('fin-ano');
+  sel.innerHTML=anosArr.map(function(a){return '<option value="'+a+'"'+(a===new Date().getFullYear()?' selected':'')+'>'+a+'</option>';}).join('');
+  renderFinanceiro();
+}
+
 document.querySelectorAll('#sidebar .nav-item').forEach(function(n){n.addEventListener('click',function(){goPage(n.getAttribute('data-page'));});});
 document.querySelectorAll('#mobile-tabs .tab').forEach(function(t){t.addEventListener('click',function(){goPage(t.getAttribute('data-page'));});});
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('show');}
 
 // DASHBOARD
 function renderDashboard(){
-  var totalFat=DB.pedidos.reduce(function(s,p){return s+calcPedidoFat(p);},0);
-  var totalLucro=DB.pedidos.reduce(function(s,p){return s+calcPedidoLucro(p);},0);
-  var totalInv=DB.invest.reduce(function(s,i){return s+(parseFloat(i.valor)||0);},0);
+  var agora=new Date();
+  var mesAtualNum=agora.getMonth()+1;
+  var anoAtual=agora.getFullYear();
+  var mesPad=String(mesAtualNum).padStart(2,'0');
+  var prefixoMes=anoAtual+'-'+mesPad;
+  var nomesMes=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  var nomeMesAtual=nomesMes[mesAtualNum-1]+' '+anoAtual;
+
+  // Filtrar por mês atual
+  var pedidosMes=DB.pedidos.filter(function(p){return p.data_pedido&&p.data_pedido.startsWith(prefixoMes);});
+  var investMes=DB.invest.filter(function(i){return i.data&&i.data.startsWith(prefixoMes);});
+  var itensMes=DB.itensPedido.filter(function(i){
+    var p=DB.pedidos.find(function(p){return p.id===i.pedido_id;});
+    return p&&p.data_pedido&&p.data_pedido.startsWith(prefixoMes);
+  });
+
+  var totalFat=pedidosMes.reduce(function(s,p){return s+calcPedidoFat(p);},0);
+  var totalLucro=pedidosMes.reduce(function(s,p){return s+calcPedidoLucro(p);},0);
+  var totalInv=investMes.reduce(function(s,i){return s+(parseFloat(i.valor)||0);},0);
   var caixa=totalLucro-totalInv;
   var pct=totalFat>0?((totalLucro/totalFat)*100).toFixed(1):'0.0';
   var pendentes=DB.pedidos.filter(function(p){return p.status==='Pendente';});
   var comprados=DB.pedidos.filter(function(p){return p.status==='Comprado';});
+  var qtdCamisas=itensMes.reduce(function(s,i){return s+(parseInt(i.qtd)||1);},0);
+
   var hj=hoje();
   var recVenc=DB.receber.filter(function(r){return !r.pago&&r.data_receber<=hj;});
   var recPend=DB.receber.filter(function(r){return !r.pago;});
   var totalRec=recPend.reduce(function(s,r){return s+(parseFloat(r.valor_receber)||0);},0);
 
-  var qtdCamisas=DB.itensPedido.reduce(function(s,i){return s+(parseInt(i.qtd)||1);},0);
+  // Label do mês
+  document.getElementById('d-mes-label').textContent='📅 '+nomeMesAtual;
 
   document.getElementById('d-fat').textContent=brl(totalFat);
   document.getElementById('d-lucro').textContent=brl(totalLucro);
@@ -862,7 +966,7 @@ function renderDashboard(){
   document.getElementById('d-inv').textContent=brl(totalInv);
   document.getElementById('d-caixa').textContent=brl(caixa);
   document.getElementById('d-caixa-card').className='dash-card '+(caixa>=0?'gold':'red-c');
-  document.getElementById('d-qtd').textContent=DB.pedidos.length;
+  document.getElementById('d-qtd').textContent=pedidosMes.length;
   document.getElementById('d-pend').textContent=pendentes.length;
   document.getElementById('d-qtd-camisas').textContent=qtdCamisas;
   document.getElementById('d-rec-total').textContent=brl(totalRec);
@@ -877,10 +981,9 @@ function renderDashboard(){
   }
 
   // Aniversariantes do mês
-  var mesAtual=new Date().getMonth()+1;
   var anivMes=DB.clientes.filter(function(c){
     if(!c.aniversario)return false;
-    return parseInt(c.aniversario.split('-')[1])===mesAtual;
+    return parseInt(c.aniversario.split('-')[1])===mesAtualNum;
   });
   var anivBox=document.getElementById('d-aniv-box');
   if(anivMes.length>0){
@@ -909,18 +1012,193 @@ function renderDashboard(){
 
   var opsEl=document.getElementById('d-ops');
   var emptyEl=document.getElementById('d-ops-empty');
-  var ultimos=DB.pedidos.slice(0,5);
+  var ultimos=DB.pedidos.slice(0,10);
   if(ultimos.length===0){opsEl.innerHTML='';emptyEl.style.display='block';return;}
   emptyEl.style.display='none';
-  opsEl.innerHTML=ultimos.map(function(p){
-    var fat=calcPedidoFat(p);var lucro=calcPedidoLucro(p);
-    var itens=DB.itensPedido.filter(function(i){return i.pedido_id===p.id;});
-    return '<div class="pedido-card" style="border-left-color:'+badgeBg(p.status)+';cursor:pointer" onclick="verPedido('+p.id+')">'
-      +'<div class="pedido-card-header">'
-      +'<div><div class="pedido-cliente">'+p.cliente+'</div><div class="pedido-meta">'+dataBR(p.data_pedido)+' · '+itens.length+' item(s)</div></div>'
-      +'<div class="pedido-vals"><div class="pedido-total">'+brl(fat)+'</div><div class="pedido-lucro" style="color:'+(lucro>=0?'var(--green)':'var(--red)')+'">+'+brl(lucro)+'</div><span class="badge" style="background:'+badgeBg(p.status)+'">'+p.status+'</span></div>'
-      +'</div></div>';
-  }).join('');
+  opsEl.innerHTML='<div style="background:var(--bg3);border-radius:14px;overflow:hidden">'
+    +'<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;padding:10px 16px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px">'
+    +'<span>Cliente</span><span>Data</span><span style="text-align:center">Camisas</span><span style="text-align:right">Total</span>'
+    +'</div>'
+    +ultimos.map(function(p){
+      var fat=calcPedidoFat(p);
+      var itens=DB.itensPedido.filter(function(i){return i.pedido_id===p.id;});
+      var qtdTotal=itens.reduce(function(s,i){return s+(parseInt(i.qtd)||1);},0);
+      return '<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;padding:12px 16px;border-bottom:1px solid var(--border);align-items:center;cursor:pointer;transition:background .15s" onmouseover="this.style.background=\'var(--bg4)\'" onmouseout="this.style.background=\'\'" onclick="goPage(\'pedidos\')">'
+        +'<div><div style="font-weight:700;font-size:14px">'+p.cliente+'</div><span class="badge" style="background:'+badgeBg(p.status)+'">'+p.status+'</span></div>'
+        +'<div style="font-size:13px;color:var(--text2)">'+dataBR(p.data_pedido)+'</div>'
+        +'<div style="text-align:center;font-size:14px;font-weight:700;color:var(--green)">'+qtdTotal+'</div>'
+        +'<div style="text-align:right;font-size:14px;font-weight:800">'+brl(fat)+'</div>'
+        +'</div>';
+    }).join('')
+    +'</div>';
+}
+
+// FINANCEIRO
+function renderFinanceiro(){
+  var periodo=document.getElementById('fin-periodo').value;
+  var ano=parseInt(document.getElementById('fin-ano').value)||new Date().getFullYear();
+  var nomesMes=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+  // Filtrar pedidos pelo período
+  var pedFilt=DB.pedidos.filter(function(p){
+    if(!p.data_pedido)return periodo==='todos';
+    var anoP=parseInt(p.data_pedido.split('-')[0]);
+    var mesP=p.data_pedido.split('-')[1];
+    if(periodo==='todos')return true;
+    if(periodo==='mes')return p.data_pedido.startsWith(new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0'));
+    return anoP===ano&&mesP===periodo;
+  });
+  var invFilt=DB.invest.filter(function(i){
+    if(!i.data)return periodo==='todos';
+    var anoI=parseInt(i.data.split('-')[0]);
+    var mesI=i.data.split('-')[1];
+    if(periodo==='todos')return true;
+    if(periodo==='mes')return i.data.startsWith(new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0'));
+    return anoI===ano&&mesI===periodo;
+  });
+  var itensFilt=DB.itensPedido.filter(function(i){
+    var p=DB.pedidos.find(function(x){return x.id===i.pedido_id;});
+    return p&&pedFilt.indexOf(p)>=0;
+  });
+
+  var fat=pedFilt.reduce(function(s,p){return s+calcPedidoFat(p);},0);
+  var lucroBruto=pedFilt.reduce(function(s,p){return s+calcPedidoLucro(p);},0);
+  var inv=invFilt.reduce(function(s,i){return s+(parseFloat(i.valor)||0);},0);
+  var lucroLiq=lucroBruto-inv;
+  var pctBruto=fat>0?((lucroBruto/fat)*100).toFixed(1):'0.0';
+  var pctLiq=fat>0?((lucroLiq/fat)*100).toFixed(1):'0.0';
+  var qtdCam=itensFilt.reduce(function(s,i){return s+(parseInt(i.qtd)||1);},0);
+  var ticket=pedFilt.length>0?(fat/pedFilt.length):0;
+
+  document.getElementById('fin-fat').textContent=brl(fat);
+  document.getElementById('fin-lucro-bruto').textContent=brl(lucroBruto);
+  document.getElementById('fin-pct-bruto').textContent=pctBruto+'% do fat.';
+  document.getElementById('fin-inv').textContent=brl(inv);
+  document.getElementById('fin-lucro-liq').textContent=brl(lucroLiq);
+  document.getElementById('fin-lucro-liq').style.color=lucroLiq>=0?'var(--gold)':'var(--red)';
+  document.getElementById('fin-pct-liq').textContent=pctLiq+'% do fat.';
+  document.getElementById('fin-qtd-ped').textContent=pedFilt.length;
+  document.getElementById('fin-qtd-cam').textContent=qtdCam;
+  document.getElementById('fin-ticket').textContent=brl(ticket);
+
+  // Evolução mensal (últimos 6 meses ou meses do ano selecionado)
+  var mesesEvolucao=[];
+  if(periodo==='todos'||periodo==='mes'){
+    // Últimos 6 meses
+    for(var i=5;i>=0;i--){
+      var d=new Date();d.setMonth(d.getMonth()-i);
+      var m=String(d.getMonth()+1).padStart(2,'0');
+      var a=d.getFullYear();
+      mesesEvolucao.push({label:nomesMes[d.getMonth()]+'/'+String(a).slice(2),prefixo:a+'-'+m});
+    }
+  } else {
+    for(var i=0;i<12;i++){
+      var m=String(i+1).padStart(2,'0');
+      mesesEvolucao.push({label:nomesMes[i],prefixo:ano+'-'+m});
+    }
+  }
+
+  var maxFat=0;
+  var dadosMeses=mesesEvolucao.map(function(mes){
+    var pMes=DB.pedidos.filter(function(p){return p.data_pedido&&p.data_pedido.startsWith(mes.prefixo);});
+    var fMes=pMes.reduce(function(s,p){return s+calcPedidoFat(p);},0);
+    var lMes=pMes.reduce(function(s,p){return s+calcPedidoLucro(p);},0);
+    if(fMes>maxFat)maxFat=fMes;
+    return {label:mes.label,fat:fMes,lucro:lMes};
+  });
+
+  // Gráfico de barras simples
+  var graficoHtml='<div style="display:flex;align-items:flex-end;gap:8px;height:120px;padding:0 4px">';
+  dadosMeses.forEach(function(m){
+    var hFat=maxFat>0?Math.round((m.fat/maxFat)*100):0;
+    var hLuc=maxFat>0?Math.round((m.lucro/maxFat)*100):0;
+    graficoHtml+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">'
+      +'<div style="width:100%;display:flex;gap:2px;align-items:flex-end;height:90px">'
+      +'<div style="flex:1;background:var(--green);opacity:.7;height:'+hFat+'%;border-radius:4px 4px 0 0;min-height:'+(m.fat>0?'4px':'0')+'"></div>'
+      +'<div style="flex:1;background:var(--blue);opacity:.7;height:'+hLuc+'%;border-radius:4px 4px 0 0;min-height:'+(m.lucro>0?'4px':'0')+'"></div>'
+      +'</div>'
+      +'<span style="font-size:10px;color:var(--text3)">'+m.label+'</span>'
+      +'</div>';
+  });
+  graficoHtml+='</div>'
+    +'<div style="display:flex;gap:16px;margin-top:8px;justify-content:center">'
+    +'<span style="font-size:11px;color:var(--green)">■ Faturamento</span>'
+    +'<span style="font-size:11px;color:var(--blue)">■ Lucro</span>'
+    +'</div>';
+  document.getElementById('fin-evolucao').innerHTML=graficoHtml;
+
+  // Top clientes
+  var clienteMap={};
+  pedFilt.forEach(function(p){
+    if(!clienteMap[p.cliente])clienteMap[p.cliente]={fat:0,qtd:0};
+    clienteMap[p.cliente].fat+=calcPedidoFat(p);
+    clienteMap[p.cliente].qtd++;
+  });
+  var topCli=Object.keys(clienteMap).map(function(n){return {nome:n,fat:clienteMap[n].fat,qtd:clienteMap[n].qtd};})
+    .sort(function(a,b){return b.fat-a.fat;}).slice(0,5);
+  document.getElementById('fin-top-clientes').innerHTML=topCli.length===0?'<p style="color:var(--text3);font-size:13px">Nenhum dado.</p>':
+    topCli.map(function(c,i){
+      var pct=fat>0?((c.fat/fat)*100).toFixed(0):0;
+      return '<div style="margin-bottom:10px">'
+        +'<div style="display:flex;justify-content:space-between;margin-bottom:4px">'
+        +'<span style="font-size:13px;font-weight:700">'+(i+1)+'. '+c.nome+'</span>'
+        +'<span style="font-size:13px;font-weight:700;color:var(--green)">'+brl(c.fat)+'</span>'
+        +'</div>'
+        +'<div style="background:var(--bg4);border-radius:4px;height:6px">'
+        +'<div style="background:var(--green);height:6px;border-radius:4px;width:'+pct+'%"></div>'
+        +'</div>'
+        +'<span style="font-size:11px;color:var(--text3)">'+c.qtd+' pedido(s) · '+pct+'% do fat.</span>'
+        +'</div>';
+    }).join('');
+
+  // Top camisas
+  var camisaMap={};
+  itensFilt.forEach(function(it){
+    var key=it.descricao;
+    if(!camisaMap[key])camisaMap[key]={qtd:0,fat:0};
+    camisaMap[key].qtd+=(parseInt(it.qtd)||1);
+    camisaMap[key].fat+=(parseFloat(it.valor_venda)||0)*(parseInt(it.qtd)||1);
+  });
+  var topCam=Object.keys(camisaMap).map(function(n){return {nome:n,qtd:camisaMap[n].qtd,fat:camisaMap[n].fat};})
+    .sort(function(a,b){return b.qtd-a.qtd;}).slice(0,5);
+  var maxQtd=topCam.length>0?topCam[0].qtd:1;
+  document.getElementById('fin-top-camisas').innerHTML=topCam.length===0?'<p style="color:var(--text3);font-size:13px">Nenhum dado.</p>':
+    topCam.map(function(c,i){
+      var pct=Math.round((c.qtd/maxQtd)*100);
+      return '<div style="margin-bottom:10px">'
+        +'<div style="display:flex;justify-content:space-between;margin-bottom:4px">'
+        +'<span style="font-size:13px;font-weight:700">'+(i+1)+'. '+c.nome+'</span>'
+        +'<span style="font-size:13px;font-weight:700;color:var(--blue)">'+c.qtd+' un.</span>'
+        +'</div>'
+        +'<div style="background:var(--bg4);border-radius:4px;height:6px">'
+        +'<div style="background:var(--blue);height:6px;border-radius:4px;width:'+pct+'%"></div>'
+        +'</div>'
+        +'<span style="font-size:11px;color:var(--text3)">'+brl(c.fat)+' em vendas</span>'
+        +'</div>';
+    }).join('');
+
+  // Comparativo mensal tabela
+  var compHtml='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">'
+    +'<thead><tr style="border-bottom:1px solid var(--border)">'
+    +'<th style="text-align:left;padding:8px;color:var(--text3);font-weight:700">Mês</th>'
+    +'<th style="text-align:right;padding:8px;color:var(--text3);font-weight:700">Faturamento</th>'
+    +'<th style="text-align:right;padding:8px;color:var(--text3);font-weight:700">Lucro</th>'
+    +'<th style="text-align:right;padding:8px;color:var(--text3);font-weight:700">%</th>'
+    +'<th style="text-align:right;padding:8px;color:var(--text3);font-weight:700">Pedidos</th>'
+    +'</tr></thead><tbody>';
+  dadosMeses.forEach(function(m){
+    var pM=DB.pedidos.filter(function(p){return p.data_pedido&&p.data_pedido.startsWith(mesesEvolucao.find(function(x){return x.label===m.label;}).prefixo);});
+    var pctM=m.fat>0?((m.lucro/m.fat)*100).toFixed(1):'0.0';
+    compHtml+='<tr style="border-bottom:1px solid var(--border)">'
+      +'<td style="padding:8px;font-weight:600">'+m.label+'</td>'
+      +'<td style="padding:8px;text-align:right;color:var(--green)">'+brl(m.fat)+'</td>'
+      +'<td style="padding:8px;text-align:right;color:var(--blue)">'+brl(m.lucro)+'</td>'
+      +'<td style="padding:8px;text-align:right;color:var(--text2)">'+pctM+'%</td>'
+      +'<td style="padding:8px;text-align:right;color:var(--text2)">'+pM.length+'</td>'
+      +'</tr>';
+  });
+  compHtml+='</tbody></table></div>';
+  document.getElementById('fin-comparativo').innerHTML=compHtml;
 }
 
 // MÁSCARA TELEFONE
