@@ -1012,7 +1012,10 @@ function renderDashboard(){
 
   var opsEl=document.getElementById('d-ops');
   var emptyEl=document.getElementById('d-ops-empty');
-  var ultimos=DB.pedidos.slice(0,10);
+  var ultimos=DB.pedidos.slice().sort(function(a,b){
+    var da=a.data_pedido||'';var db=b.data_pedido||'';
+    return db.localeCompare(da);
+  }).slice(0,10);
   if(ultimos.length===0){opsEl.innerHTML='';emptyEl.style.display='block';return;}
   emptyEl.style.display='none';
   opsEl.innerHTML='<div style="background:var(--bg3);border-radius:14px;overflow:hidden">'
@@ -1107,25 +1110,54 @@ function renderFinanceiro(){
     return {label:mes.label,fat:fMes,lucro:lMes};
   });
 
-  // Gráfico de barras simples
-  var graficoHtml='<div style="display:flex;align-items:flex-end;gap:8px;height:120px;padding:0 4px">';
-  dadosMeses.forEach(function(m){
-    var hFat=maxFat>0?Math.round((m.fat/maxFat)*100):0;
-    var hLuc=maxFat>0?Math.round((m.lucro/maxFat)*100):0;
-    graficoHtml+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">'
-      +'<div style="width:100%;display:flex;gap:2px;align-items:flex-end;height:90px">'
-      +'<div style="flex:1;background:var(--green);opacity:.7;height:'+hFat+'%;border-radius:4px 4px 0 0;min-height:'+(m.fat>0?'4px':'0')+'"></div>'
-      +'<div style="flex:1;background:var(--blue);opacity:.7;height:'+hLuc+'%;border-radius:4px 4px 0 0;min-height:'+(m.lucro>0?'4px':'0')+'"></div>'
-      +'</div>'
-      +'<span style="font-size:10px;color:var(--text3)">'+m.label+'</span>'
-      +'</div>';
-  });
-  graficoHtml+='</div>'
-    +'<div style="display:flex;gap:16px;margin-top:8px;justify-content:center">'
-    +'<span style="font-size:11px;color:var(--green)">■ Faturamento</span>'
-    +'<span style="font-size:11px;color:var(--blue)">■ Lucro</span>'
+  // Gráfico de linhas
+  var W=800,H=200,PL=50,PR=20,PT=20,PB=40;
+  var maxVal=Math.max.apply(null,dadosMeses.map(function(m){return m.fat;}));
+  if(maxVal===0)maxVal=1;
+  var n=dadosMeses.length;
+  var stepX=(W-PL-PR)/(n-1||1);
+
+  function px(i){return PL+i*stepX;}
+  function py(v){return PT+H-(v/maxVal)*(H-PB);}
+
+  function pontos(arr){
+    return arr.map(function(m,i){return px(i)+','+py(m);}).join(' ');
+  }
+  function linha(arr,cor){
+    var pts=arr.map(function(m,i){return px(i)+','+py(m);});
+    return '<polyline points="'+pts.join(' ')+'" fill="none" stroke="'+cor+'" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>'
+      +pts.map(function(pt,i){
+        var xy=pt.split(',');
+        return '<circle cx="'+xy[0]+'" cy="'+xy[1]+'" r="4" fill="'+cor+'"><title>'+dadosMeses[i].label+': '+brl(arr[i])+'</title></circle>';
+      }).join('');
+  }
+
+  // Grid lines
+  var grid='';
+  for(var gi=0;gi<=4;gi++){
+    var gy=PT+(H-PB)/4*gi;
+    var gval=Math.round(maxVal*(1-gi/4));
+    grid+='<line x1="'+PL+'" y1="'+gy+'" x2="'+(W-PR)+'" y2="'+gy+'" stroke="#2a2a38" stroke-width="1"/>'
+      +'<text x="'+(PL-6)+'" y="'+(gy+4)+'" text-anchor="end" font-size="10" fill="#666680">'+brl(gval).replace('R$\u00a0','').replace('R$ ','')+'</text>';
+  }
+
+  // Labels eixo X
+  var xLabels=dadosMeses.map(function(m,i){
+    return '<text x="'+px(i)+'" y="'+(PT+H+2)+'" text-anchor="middle" font-size="10" fill="#666680">'+m.label+'</text>';
+  }).join('');
+
+  var svg='<svg viewBox="0 0 '+W+' '+(H+PT+20)+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-height:220px">'
+    +grid
+    +linha(dadosMeses.map(function(m){return m.fat;}),'#2ecc71')
+    +linha(dadosMeses.map(function(m){return m.lucro;}),'#3498db')
+    +xLabels
+    +'</svg>'
+    +'<div style="display:flex;gap:20px;justify-content:center;margin-top:8px">'
+    +'<span style="font-size:12px;color:#2ecc71">● Faturamento</span>'
+    +'<span style="font-size:12px;color:#3498db">● Lucro</span>'
     +'</div>';
-  document.getElementById('fin-evolucao').innerHTML=graficoHtml;
+
+  document.getElementById('fin-evolucao').innerHTML=svg;
 
   // Top clientes
   var clienteMap={};
